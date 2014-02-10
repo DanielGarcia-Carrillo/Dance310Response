@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>This is your life</title>
+  <link rel="stylesheet" href="./main.css">
+</head>
+<body>
+  <div id="fb-root"></div>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+  <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '1458870684326185',
+        status     : true, // check login status
+        cookie     : true, // enable cookies to allow the server to access the session
+        xfbml      : true  // parse XFBML
+    });
+
+    FB.Event.subscribe('auth.authResponseChange', function(response) {
+      if (response.status === 'connected') {
+        runEphemeralCollage();
+      } else if (response.status === 'not_authorized') {
+        FB.login(
+          function(response){
+            console.log(response);
+          },
+          {scope: 'user_photos,friends_photos'}
+        );
+      } else {
+        FB.login(
+          function(response){
+            console.log(response);
+          },
+          {scope: 'user_photos,friends_photos'}
+        );
+      }
+    });
+    };
+    // Load the SDK asynchronously
+    (function(d){
+     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement('script'); js.id = id; js.async = true;
+     js.src = "//connect.facebook.net/en_US/all.js";
+     ref.parentNode.insertBefore(js, ref);
+    }(document));
+
+    // Here we run a very simple test of the Graph API after login is successful. 
+    // This testAPI() function is only called in those cases. 
+    function runEphemeralCollage() {
+      // Hide our login button
+      var login_button = document.getElementById('login-button');
+      login_button.style.display = 'none';
+      FB.api('/me/photos?limit=50', function(response) {
+        if (response && !response.error) {
+          var imgSources = [];
+          // Grab all of the photo SRCs
+          console.log('Length of response data', response.data.length);
+          _.each(response.data, function(item) {
+            item.source && imgSources.push({
+              source: item.source,
+              height: item.height,
+              width: item.width
+            });
+          });
+          // I don't want the images in chronological order
+          imgSources = _.shuffle(imgSources);
+          console.log(imgSources.length);
+          
+          // browser width/height get affected by picture placement, so we take the measurement before inserting images
+          var browserWidth = document.documentElement.clientWidth;
+          var browserHeight = document.documentElement.clientHeight;
+          
+          var index = 0;
+          var length = imgSources.length;
+          var intervalFunc;
+          
+          function showImage() {
+            var imgData = imgSources[index];
+            var imgElem = document.createElement('img');
+            var offscreenHeight = imgData.height/3;
+            var offscreenWidth = imgData.width/3;
+            // Allows images to appear off screen, this gives a more full look to the collage
+            // also compensates so that the image doesn't appear way off the bottom and right edges
+            var xPos = _.random(0-offscreenWidth, browserWidth-(imgData.width - offscreenWidth));
+            var yPos = _.random(0-offscreenHeight, browserHeight-(imgData.height - offscreenHeight));
+            
+            imgElem.style.left = xPos + 'px';
+            imgElem.style.top = yPos + 'px';
+            imgElem.src = imgData.source;
+            document.body.appendChild(imgElem);
+            // Add fading animation after added to dom, doesn't work if added before
+            imgElem.classList.add('photo');
+            // Remove from dom because we don't want to have extraneous img elements hanging around
+            setTimeout(function() {
+              document.body.removeChild(imgElem);
+            }, 2500);
+            
+            // Advance iterator, or clear this interval function
+            if (index < length - 1) {
+              index++;
+            } else {
+              clearInterval(intervalFunc);
+            }
+          }
+          intervalFunc = setInterval(showImage, 750);         
+        }
+        
+        
+      });
+    }
+  </script>
+  <fb:login-button id="login-button" show-faces="false" width="200" max-rows="1"></fb:login-button>
+
+</body>
+</html>

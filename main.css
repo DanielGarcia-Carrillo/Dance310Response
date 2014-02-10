@@ -1,0 +1,55 @@
+body {
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  width: 100%;
+}
+
+#login-button {
+  margin: auto;
+}
+
+img {
+  opacity: 1;
+  position: absolute;
+}
+
+.photo {
+  opacity: 0;
+  
+  -webkit-animation: fadeout 2s; /* Safari and Chrome */
+     -moz-animation: fadeout 2s; /* Firefox */
+      -ms-animation: fadeout 2s; /* Internet Explorer */
+       -o-animation: fadeout 2s; /* Opera */
+          animation: fadeout 2s;
+}
+
+@keyframes fadeout {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+/* Firefox */
+@-moz-keyframes fadeout {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+/* Safari and Chrome */
+@-webkit-keyframes fadeout {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadeout {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}​
+
+/* Opera */
+@-o-keyframes fadeout {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}​
+ 
